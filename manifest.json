@@ -1,0 +1,12 @@
+{
+  "name": "Autoescola Rota Certa",
+  "short_name": "Rota Certa",
+  "description": "Sua habilitação com quem entende o caminho.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#F6F5F2",
+  "theme_color": "#1E4FD8",
+  "icons": [
+    { "src": "assets/icons/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

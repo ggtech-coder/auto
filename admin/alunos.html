@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alunos — Painel Rota Certa</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Alunos</h1>
+      <button class="btn btn-primary btn-sm" id="btnNovoAluno">+ Novo aluno</button>
+    </div>
+
+    <div class="panel">
+      <div class="toolbar">
+        <input type="search" id="buscaAluno" placeholder="Pesquisar por nome ou CPF...">
+        <div class="filters">
+          <select id="filtroSituacao">
+            <option value="">Todas as situações</option>
+            <option value="ativo">Ativo</option>
+            <option value="pendente">Pendente</option>
+            <option value="concluido">Concluído</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="tabelaAlunos">
+          <thead><tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>Categoria</th><th>Situação</th><th>Ações</th></tr></thead>
+          <tbody><tr><td colspan="6">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal cadastro/edição -->
+<div class="modal-overlay" id="modalAluno">
+  <div class="modal-box">
+    <h3 id="modalAlunoTitulo">Novo aluno</h3>
+    <form id="formAluno">
+      <input type="hidden" id="alunoId">
+      <div class="form-grid">
+        <div class="form-field"><label>Nome completo</label><input type="text" id="fNome" required></div>
+        <div class="form-field"><label>CPF</label><input type="text" id="fCpf" required></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>RG</label><input type="text" id="fRg"></div>
+        <div class="form-field"><label>Data de nascimento</label><input type="date" id="fNascimento"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Telefone</label><input type="tel" id="fTelefone"></div>
+        <div class="form-field"><label>E-mail</label><input type="email" id="fEmail"></div>
+      </div>
+      <div class="form-field"><label>Endereço</label><input type="text" id="fEndereco"></div>
+      <div class="form-grid">
+        <div class="form-field"><label>Categoria</label>
+          <select id="fCategoria"><option value="">-</option></select>
+        </div>
+        <div class="form-field"><label>Situação</label>
+          <select id="fSituacao">
+            <option value="ativo">Ativo</option>
+            <option value="pendente">Pendente</option>
+            <option value="concluido">Concluído</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-close-row">
+        <button type="button" class="btn btn-outline btn-sm" onclick="fecharModalAluno()">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal histórico -->
+<div class="modal-overlay" id="modalHistorico">
+  <div class="modal-box">
+    <h3>Histórico de aulas</h3>
+    <div class="table-wrap">
+      <table class="data-table" id="tabelaHistorico">
+        <thead><tr><th>Data</th><th>Horário</th><th>Tipo</th><th>Instrutor</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="modal-close-row">
+      <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('modalHistorico').classList.remove('open')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script src="../config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script src="../js/admin/alunos.js"></script>
+</body>
+</html>

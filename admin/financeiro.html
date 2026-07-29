@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financeiro — Painel Rota Certa</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Financeiro</h1>
+      <button class="btn btn-primary btn-sm" id="btnNovoPagamento">+ Novo lançamento</button>
+    </div>
+
+    <p class="form-help mb-md" style="max-width:70ch;">
+      Módulo de controle manual de pagamentos (PIX, cartão, boleto). A integração automática com
+      gateways de pagamento pode ser adicionada futuramente — veja o README para detalhes.
+    </p>
+
+    <div class="kpi-grid" style="grid-template-columns: repeat(3,1fr);">
+      <div class="kpi-card"><div class="label">Recebido no mês</div><div class="value" id="kpiRecebido">–</div></div>
+      <div class="kpi-card"><div class="label">Pendente</div><div class="value" id="kpiPendente">–</div></div>
+      <div class="kpi-card"><div class="label">Atrasado</div><div class="value" id="kpiAtrasado">–</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="table-wrap">
+        <table class="data-table" id="tabelaFinanceiro">
+          <thead><tr><th>Aluno</th><th>Descrição</th><th>Valor</th><th>Forma</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody><tr><td colspan="7">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalPagamento">
+  <div class="modal-box">
+    <h3 id="modalPagamentoTitulo">Novo lançamento</h3>
+    <form id="formPagamento">
+      <input type="hidden" id="pagamentoId">
+      <div class="form-field"><label>Aluno</label><input type="text" id="pAluno" required placeholder="Nome do aluno"></div>
+      <div class="form-field"><label>Descrição</label><input type="text" id="pDescricao" placeholder="Ex: Parcela 2/6 - pacote de aulas"></div>
+      <div class="form-grid">
+        <div class="form-field"><label>Valor (R$)</label><input type="number" step="0.01" id="pValor" required></div>
+        <div class="form-field"><label>Forma de pagamento</label>
+          <select id="pForma"><option>PIX</option><option>Cartão de crédito</option><option>Boleto</option><option>Dinheiro</option></select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Vencimento</label><input type="date" id="pData" required></div>
+        <div class="form-field"><label>Status</label>
+          <select id="pStatus"><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="atrasado">Atrasado</option></select>
+        </div>
+      </div>
+      <div class="modal-close-row">
+        <button type="button" class="btn btn-outline btn-sm" onclick="fecharModalPagamento()">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script src="../js/admin/financeiro.js"></script>
+</body>
+</html>

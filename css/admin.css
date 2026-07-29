@@ -1,0 +1,77 @@
+/* ============================================================
+   PAINEL ADMINISTRATIVO — layout com sidebar fixa
+   ============================================================ */
+
+:root {
+  --admin-bg: #F2F1ED;
+  --admin-sidebar: #1C2126;
+  --admin-sidebar-hover: #2A313A;
+}
+
+* { box-sizing: border-box; }
+body { font-family: var(--font-body); background: var(--admin-bg); color: var(--color-ink); margin: 0; }
+
+.admin-layout { display: flex; min-height: 100vh; }
+
+.admin-sidebar {
+  width: 240px; flex-shrink: 0; background: var(--admin-sidebar); color: #fff;
+  display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
+}
+.admin-sidebar .brand { padding: 1.5rem 1.3rem; font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.admin-sidebar .brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--color-signal); }
+.admin-nav { flex: 1; padding: 1rem 0.8rem; display: flex; flex-direction: column; gap: 0.2rem; }
+.admin-nav a { display: flex; align-items: center; gap: 0.7rem; padding: 0.65rem 0.9rem; border-radius: 10px; color: #B7BCC2; font-size: 0.9rem; font-weight: 600; transition: background 0.2s, color 0.2s; }
+.admin-nav a:hover { background: var(--admin-sidebar-hover); color: #fff; }
+.admin-nav a.active { background: var(--color-primary); color: #fff; }
+.admin-sidebar .user-box { padding: 1rem 1.3rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.82rem; }
+.admin-sidebar .user-box button { margin-top: 0.6rem; background: none; border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 0.4rem 0.8rem; border-radius: 999px; font-size: 0.78rem; cursor: pointer; width: 100%; }
+.admin-sidebar .user-box button:hover { background: rgba(255,255,255,0.1); }
+
+.admin-main { flex: 1; padding: 2rem 2.4rem; max-width: 100%; overflow-x: hidden; }
+.admin-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1rem; }
+.admin-topbar h1 { font-family: var(--font-display); font-size: 1.6rem; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+@media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+.kpi-card { background: #fff; border-radius: 14px; padding: 1.3rem; border: 1px solid var(--color-line); }
+.kpi-card .label { font-size: 0.8rem; color: var(--color-ink-soft); font-weight: 600; }
+.kpi-card .value { font-family: var(--font-display); font-size: 2rem; font-weight: 800; margin-top: 0.3rem; }
+.kpi-card .delta { font-size: 0.78rem; margin-top: 0.3rem; color: var(--color-success); }
+
+.panel { background: #fff; border-radius: 14px; border: 1px solid var(--color-line); padding: 1.5rem; margin-bottom: 1.5rem; }
+.panel h2 { font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 1rem; }
+
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.data-table th { text-align: left; padding: 0.7rem 0.8rem; background: var(--admin-bg); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-soft); position: sticky; top: 0; }
+.data-table td { padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--color-line); vertical-align: middle; }
+.data-table tr:hover td { background: #FAFAF8; }
+.table-wrap { overflow-x: auto; }
+
+.badge { display: inline-block; padding: 0.25rem 0.7rem; border-radius: 999px; font-size: 0.74rem; font-weight: 700; }
+.badge-confirmado, .badge-ativo, .badge-disponivel, .badge-pago { background: rgba(46,125,91,0.12); color: var(--color-success); }
+.badge-cancelado, .badge-inativo, .badge-indisponivel, .badge-atrasado { background: rgba(196,67,43,0.12); color: var(--color-danger); }
+.badge-pendente, .badge-manutencao { background: rgba(255,198,61,0.18); color: var(--color-signal-dark); }
+.badge-concluido { background: rgba(30,79,216,0.12); color: var(--color-primary); }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap; }
+.toolbar .filters { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.toolbar select, .toolbar input { padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid var(--color-line); font-size: 0.85rem; }
+
+.icon-btn { background: none; border: 1px solid var(--color-line); border-radius: 8px; padding: 0.35rem 0.6rem; cursor: pointer; font-size: 0.8rem; margin-right: 0.3rem; }
+.icon-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.icon-btn.danger:hover { border-color: var(--color-danger); color: var(--color-danger); }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(28,33,38,0.55); display: none; align-items: center; justify-content: center; z-index: 500; padding: 1rem; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: #fff; border-radius: 16px; padding: 1.8rem; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal-box h3 { font-family: var(--font-display); margin-bottom: 1.2rem; }
+.modal-close-row { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.2rem; }
+
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--color-ink-soft); }
+
+@media (max-width: 900px) {
+  .admin-layout { flex-direction: column; }
+  .admin-sidebar { width: 100%; height: auto; position: relative; flex-direction: row; overflow-x: auto; }
+  .admin-nav { flex-direction: row; }
+  .admin-main { padding: 1.2rem; }
+}

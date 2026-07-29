@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instrutores — Painel Rota Certa</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+<style>
+.dispo-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; }
+.dispo-day { border: 1px solid var(--color-line); border-radius: 8px; padding: 0.5rem; }
+.dispo-day strong { display: block; font-size: 0.78rem; margin-bottom: 0.4rem; text-align: center; }
+.dispo-day textarea { width: 100%; font-size: 0.78rem; border: none; resize: vertical; min-height: 60px; }
+.chip-select { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip-select label { border: 1.5px solid var(--color-line); border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 0.82rem; cursor: pointer; display:flex; align-items:center; gap:0.3rem; }
+.chip-select input { width: auto; }
+@media (max-width: 900px) { .dispo-grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Instrutores</h1>
+      <button class="btn btn-primary btn-sm" id="btnNovoInstrutor">+ Novo instrutor</button>
+    </div>
+    <div class="panel">
+      <div class="table-wrap">
+        <table class="data-table" id="tabelaInstrutores">
+          <thead><tr><th>Nome</th><th>Telefone</th><th>Categorias</th><th>Veículo</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody><tr><td colspan="6">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalInstrutor">
+  <div class="modal-box" style="max-width:680px;">
+    <h3 id="modalInstrutorTitulo">Novo instrutor</h3>
+    <form id="formInstrutor">
+      <input type="hidden" id="instrutorId">
+      <div class="form-grid">
+        <div class="form-field"><label>Nome completo</label><input type="text" id="iNome" required></div>
+        <div class="form-field"><label>Telefone</label><input type="tel" id="iTelefone"></div>
+      </div>
+      <div class="form-field">
+        <label>Categorias que leciona</label>
+        <div class="chip-select" id="chipCategorias"></div>
+      </div>
+      <div class="form-field">
+        <label>Veículo padrão</label>
+        <select id="iVeiculo"><option value="">Nenhum</option></select>
+      </div>
+      <div class="form-field">
+        <label>Ativo</label>
+        <select id="iAtivo"><option value="true">Sim</option><option value="false">Não</option></select>
+      </div>
+      <div class="form-field">
+        <label>Disponibilidade semanal (um horário por linha, ex: 08:00)</label>
+        <div class="dispo-grid">
+          <div class="dispo-day"><strong>Dom</strong><textarea id="d_dom"></textarea></div>
+          <div class="dispo-day"><strong>Seg</strong><textarea id="d_seg"></textarea></div>
+          <div class="dispo-day"><strong>Ter</strong><textarea id="d_ter"></textarea></div>
+          <div class="dispo-day"><strong>Qua</strong><textarea id="d_qua"></textarea></div>
+          <div class="dispo-day"><strong>Qui</strong><textarea id="d_qui"></textarea></div>
+          <div class="dispo-day"><strong>Sex</strong><textarea id="d_sex"></textarea></div>
+          <div class="dispo-day"><strong>Sáb</strong><textarea id="d_sab"></textarea></div>
+        </div>
+      </div>
+      <div class="modal-close-row">
+        <button type="button" class="btn btn-outline btn-sm" onclick="fecharModalInstrutor()">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script src="../js/admin/instrutores.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avisos — Painel Rota Certa</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Avisos aos alunos</h1>
+      <button class="btn btn-primary btn-sm" id="btnNovoAviso">+ Novo aviso</button>
+    </div>
+    <p class="form-help mb-md" style="max-width:70ch;">Avisos publicados aqui aparecem automaticamente na área do aluno de todos os estudantes. Para alertas via WhatsApp/e-mail em massa, use um serviço externo (ver README).</p>
+    <div class="panel">
+      <div class="table-wrap">
+        <table class="data-table" id="tabelaAvisos">
+          <thead><tr><th>Título</th><th>Mensagem</th><th>Publicado em</th><th>Ações</th></tr></thead>
+          <tbody><tr><td colspan="4">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalAviso">
+  <div class="modal-box">
+    <h3>Novo aviso</h3>
+    <form id="formAviso">
+      <div class="form-field"><label>Título</label><input type="text" id="avTitulo" required></div>
+      <div class="form-field"><label>Mensagem</label><textarea id="avMensagem" rows="4" required></textarea></div>
+      <div class="modal-close-row">
+        <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('modalAviso').classList.remove('open')">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Publicar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script src="../js/admin/avisos.js"></script>
+</body>
+</html>

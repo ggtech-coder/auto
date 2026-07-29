@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veículos — Painel Rota Certa</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Veículos</h1>
+      <button class="btn btn-primary btn-sm" id="btnNovoVeiculo">+ Novo veículo</button>
+    </div>
+    <div class="panel">
+      <div class="table-wrap">
+        <table class="data-table" id="tabelaVeiculos">
+          <thead><tr><th>Modelo</th><th>Marca</th><th>Ano</th><th>Placa</th><th>Categoria</th><th>Situação</th><th>Ações</th></tr></thead>
+          <tbody><tr><td colspan="7">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalVeiculo">
+  <div class="modal-box">
+    <h3 id="modalVeiculoTitulo">Novo veículo</h3>
+    <form id="formVeiculo">
+      <input type="hidden" id="veiculoId">
+      <div class="form-grid">
+        <div class="form-field"><label>Modelo</label><input type="text" id="vModelo" required></div>
+        <div class="form-field"><label>Marca</label><input type="text" id="vMarca" required></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Ano</label><input type="number" id="vAno" min="1990" max="2030"></div>
+        <div class="form-field"><label>Placa</label><input type="text" id="vPlaca" required></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Categoria</label>
+          <select id="vCategoria"><option value="">-</option></select>
+        </div>
+        <div class="form-field"><label>Situação</label>
+          <select id="vSituacao">
+            <option value="disponivel">Disponível</option>
+            <option value="manutencao">Em manutenção</option>
+            <option value="indisponivel">Indisponível</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-close-row">
+        <button type="button" class="btn btn-outline btn-sm" onclick="fecharModalVeiculo()">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script src="../js/admin/veiculos.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /aluno/
+
+Sitemap: https://rotacerta.com.br/sitemap.xml

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Painel Rota Certa</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Dashboard</h1>
+      <span id="dataHoje" style="color:var(--color-ink-soft);font-size:0.9rem;"></span>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Total de alunos</div><div class="value" id="kpiAlunos">–</div></div>
+      <div class="kpi-card"><div class="label">Agendamentos hoje</div><div class="value" id="kpiHoje">–</div></div>
+      <div class="kpi-card"><div class="label">Agendamentos futuros</div><div class="value" id="kpiFuturos">–</div></div>
+      <div class="kpi-card"><div class="label">Cancelamentos (30 dias)</div><div class="value" id="kpiCancelamentos">–</div></div>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr);">
+      <div class="panel">
+        <h2>Novos cadastros (últimos 7 dias)</h2>
+        <canvas id="chartCadastros" height="180"></canvas>
+      </div>
+      <div class="panel">
+        <h2>Agendamentos por status</h2>
+        <canvas id="chartStatus" height="180"></canvas>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Próximos agendamentos</h2>
+      <div class="table-wrap">
+        <table class="data-table" id="tabelaProximos">
+          <thead><tr><th>Aluno</th><th>Categoria</th><th>Instrutor</th><th>Data</th><th>Horário</th><th>Status</th></tr></thead>
+          <tbody><tr><td colspan="6">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/admin/dashboard.js"></script>
+</body>
+</html>

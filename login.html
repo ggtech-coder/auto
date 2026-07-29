@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Área do Aluno / Login — Autoescola Rota Certa</title>
+<meta name="description" content="Acesse a área do aluno da Autoescola Rota Certa para ver suas próximas aulas, histórico e dados pessoais.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.auth-wrap { max-width: 440px; margin: 0 auto; }
+.tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: var(--color-bg-alt); padding: 0.3rem; border-radius: 999px; }
+.tabs button { flex: 1; border: none; background: transparent; padding: 0.6rem; border-radius: 999px; font-family: var(--font-display); font-weight: 700; font-size: 0.88rem; cursor: pointer; color: var(--color-ink-soft); }
+.tabs button.active { background: var(--color-ink); color: #fff; }
+.auth-panel { display: none; }
+.auth-panel.active { display: block; }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main id="main">
+  <section class="page-hero" style="padding-bottom: var(--space-lg);">
+    <div class="container auth-wrap">
+      <span class="eyebrow">Acesso</span>
+      <h1 style="font-size:1.9rem;">Entrar na plataforma</h1>
+      <p style="margin-top:0.5rem;margin-bottom:2rem;">Alunos e equipe administrativa acessam por aqui.</p>
+
+      <div class="tabs">
+        <button data-tab="entrar" class="active">Entrar</button>
+        <button data-tab="criar">Criar conta de aluno</button>
+      </div>
+
+      <div class="card auth-panel active" id="panel-entrar">
+        <form id="loginForm">
+          <div class="form-field"><label for="loginEmail">E-mail</label><input type="email" id="loginEmail" required></div>
+          <div class="form-field"><label for="loginSenha">Senha</label><input type="password" id="loginSenha" required minlength="6"></div>
+          <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+          <div id="loginMsg" class="form-msg"></div>
+        </form>
+        <p style="margin-top:1rem;font-size:0.85rem;text-align:center;"><a href="#" id="esqueciSenha" style="color:var(--color-primary);">Esqueci minha senha</a></p>
+      </div>
+
+      <div class="card auth-panel" id="panel-criar">
+        <form id="signupForm">
+          <div class="form-field"><label for="suNome">Nome completo</label><input type="text" id="suNome" required></div>
+          <div class="form-field"><label for="suCpf">CPF</label><input type="text" id="suCpf" required placeholder="000.000.000-00"></div>
+          <div class="form-field"><label for="suEmail">E-mail</label><input type="email" id="suEmail" required></div>
+          <div class="form-field"><label for="suSenha">Crie uma senha</label><input type="password" id="suSenha" required minlength="6"></div>
+          <button type="submit" class="btn btn-primary btn-block">Criar conta</button>
+          <div id="signupMsg" class="form-msg"></div>
+          <p class="form-help mt-md">Se você já é aluno matriculado, usaremos seu CPF para vincular sua conta ao seu histórico existente.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="config.js"></script>
+<script src="js/layout.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

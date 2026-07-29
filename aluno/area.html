@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Área do Aluno — Autoescola Rota Certa</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+<style>
+.aluno-topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem; flex-wrap:wrap; gap:1rem; }
+.aviso-card { border-left: 4px solid var(--color-signal); background: rgba(255,198,61,0.08); padding: 1rem 1.2rem; border-radius: 10px; margin-bottom: 0.8rem; }
+.aviso-card h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+.aviso-card span { font-size: 0.75rem; color: var(--color-ink-soft); }
+.doc-list { list-style:none; }
+.doc-list li { display:flex; justify-content:space-between; align-items:center; padding:0.7rem 0; border-bottom:1px solid var(--color-line); font-size:0.9rem; }
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="brand"><span class="dot"></span>Rota Certa</div>
+    <nav class="admin-nav">
+      <a href="#" class="active">🎓 Minha área</a>
+      <a href="../index.html">🌐 Ver site</a>
+    </nav>
+    <div class="user-box">
+      <div id="nomeAlunoSidebar">Aluno</div>
+      <button onclick="logout()">Sair</button>
+    </div>
+  </aside>
+  <main class="admin-main">
+    <div class="aluno-topbar">
+      <h1 style="font-family:var(--font-display);font-size:1.6rem;">Olá, <span id="nomeAlunoTopo">...</span> 👋</h1>
+      <span class="badge" id="badgeSituacao">-</span>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Categoria</div><div class="value" id="infoCategoria" style="font-size:1.4rem;">-</div></div>
+      <div class="kpi-card"><div class="label">Próxima aula</div><div class="value" id="infoProximaAula" style="font-size:1.1rem;">-</div></div>
+      <div class="kpi-card"><div class="label">Aulas concluídas</div><div class="value" id="infoConcluidas">-</div></div>
+      <div class="kpi-card"><div class="label">Faltas</div><div class="value" id="infoFaltas">-</div></div>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns: 2fr 1fr;">
+      <div class="panel">
+        <h2>Próximas aulas</h2>
+        <div class="table-wrap">
+          <table class="data-table" id="tabelaProximasAulas">
+            <thead><tr><th>Data</th><th>Horário</th><th>Tipo</th><th>Instrutor</th><th>Status</th></tr></thead>
+            <tbody><tr><td colspan="5">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2 class="mt-md">Histórico de aulas</h2>
+        <div class="table-wrap">
+          <table class="data-table" id="tabelaHistoricoAluno">
+            <thead><tr><th>Data</th><th>Horário</th><th>Tipo</th><th>Instrutor</th><th>Status</th></tr></thead>
+            <tbody><tr><td colspan="5">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <h2>Comunicados</h2>
+          <div id="listaAvisos"><p class="form-help">Carregando...</p></div>
+        </div>
+
+        <div class="panel">
+          <h2>Meus dados</h2>
+          <div id="meusDados" style="font-size:0.9rem;line-height:1.9;"></div>
+          <button class="btn btn-outline btn-sm mt-md" id="btnEditarDados">Solicitar atualização de dados</button>
+        </div>
+
+        <div class="panel">
+          <h2>Documentos</h2>
+          <ul class="doc-list">
+            <li>Comprovante de matrícula <a href="#" class="btn btn-outline btn-sm" onclick="alert('Solicite este documento na secretaria ou pelo WhatsApp.');return false;">Solicitar</a></li>
+            <li>Declaração de aulas <a href="#" class="btn btn-outline btn-sm" onclick="alert('Solicite este documento na secretaria ou pelo WhatsApp.');return false;">Solicitar</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/aluno.js"></script>
+</body>
+</html>

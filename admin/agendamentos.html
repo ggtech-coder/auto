@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agendamentos — Painel Rota Certa</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Agendamentos</h1>
+      <button class="btn btn-primary btn-sm" id="btnNovoAgendamento">+ Novo agendamento</button>
+    </div>
+
+    <div class="panel">
+      <div class="toolbar">
+        <div class="filters">
+          <input type="date" id="filtroData">
+          <select id="filtroInstrutor"><option value="">Todos os instrutores</option></select>
+          <select id="filtroCategoria"><option value="">Todas as categorias</option></select>
+          <select id="filtroTipo"><option value="">Todos os tipos</option></select>
+          <select id="filtroStatus">
+            <option value="">Todos os status</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="concluido">Concluído</option>
+            <option value="cancelado">Cancelado</option>
+            <option value="falta">Falta</option>
+          </select>
+        </div>
+        <button class="btn btn-outline btn-sm" id="btnLimparFiltros">Limpar filtros</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="tabelaAgendamentos">
+          <thead><tr><th>Aluno</th><th>Categoria</th><th>Tipo</th><th>Instrutor</th><th>Data</th><th>Horário</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody><tr><td colspan="8">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalAgendamento">
+  <div class="modal-box">
+    <h3 id="modalAgendamentoTitulo">Novo agendamento</h3>
+    <form id="formAgendamento">
+      <input type="hidden" id="agendamentoId">
+      <div class="form-grid">
+        <div class="form-field"><label>Nome do aluno</label><input type="text" id="aNome" required></div>
+        <div class="form-field"><label>CPF</label><input type="text" id="aCpf" required></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Telefone</label><input type="tel" id="aTelefone"></div>
+        <div class="form-field"><label>E-mail</label><input type="email" id="aEmail"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Categoria</label><select id="aCategoria" required></select></div>
+        <div class="form-field"><label>Tipo de aula</label><select id="aTipo" required></select></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Instrutor</label><select id="aInstrutor" required></select></div>
+        <div class="form-field"><label>Veículo</label><select id="aVeiculo"><option value="">-</option></select></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Data</label><input type="date" id="aData" required></div>
+        <div class="form-field"><label>Horário</label><input type="time" id="aHorario" required></div>
+      </div>
+      <div class="form-field"><label>Status</label>
+        <select id="aStatus">
+          <option value="confirmado">Confirmado</option>
+          <option value="concluido">Concluído</option>
+          <option value="cancelado">Cancelado</option>
+          <option value="falta">Falta</option>
+        </select>
+      </div>
+      <div class="modal-close-row">
+        <button type="button" class="btn btn-outline btn-sm" onclick="fecharModalAgendamento()">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebase-init.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script src="../js/admin/agendamentos.js"></script>
+</body>
+</html>
