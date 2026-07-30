@@ -61,8 +61,14 @@ service cloud.firestore {
     }
 
     match /agendamentos/{id} {
+      // Leitura pública: necessária para a página de agendamento (sem login) verificar
+      // quais horários já estão ocupados antes de permitir a confirmação.
+      // Atenção: isso torna nome/CPF/telefone/e-mail dos agendamentos visíveis a quem
+      // souber consultar a coleção diretamente. Para um projeto em produção com mais
+      // rigor de LGPD, mova essa checagem para uma Cloud Function (plano Blaze) que
+      // devolva só os horários ocupados, sem os dados pessoais. Ver README, seção 7.
+      allow read: if true;
       allow create: if true; // agendamento online público
-      allow read: if isAdmin() || isSignedIn();
       allow update, delete: if isAdmin();
     }
 

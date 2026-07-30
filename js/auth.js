@@ -17,6 +17,24 @@ async function redirecionarPorPerfil(uid) {
 
 // ---------- Página de login (login.html) ----------
 document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const erro = params.get("erro");
+  if (erro) {
+    const box = document.createElement("div");
+    box.className = "form-msg show error";
+    box.style.maxWidth = "440px";
+    box.style.margin = "0 auto 1.2rem";
+    if (erro === "sem-perfil") {
+      box.textContent = "Sua conta existe no Firebase, mas não tem um perfil configurado no Firestore (coleção \"users\"). Veja o README, seção 3, para criar o administrador corretamente.";
+    } else if (erro === "perfil-incorreto") {
+      const esperado = params.get("esperado");
+      box.textContent = esperado === "admin"
+        ? "Essa conta não tem permissão de administrador. Entre com uma conta de aluno na aba \"Entrar\", ou cadastre o admin conforme o README."
+        : "Essa conta é de administrador — use o painel administrativo, não a área do aluno.";
+    }
+    document.querySelector(".auth-wrap")?.prepend(box);
+  }
+
   const tabs = document.querySelectorAll(".tabs button");
   if (tabs.length) {
     tabs.forEach((tab) => {
@@ -135,22 +153,49 @@ function traduzErroFirebase(code) {
 
 // ---------- Guarda de rotas (usada em admin/*.html e aluno/*.html) ----------
 // Uso: chamar exigirLogin("admin") ou exigirLogin("aluno") no topo da página.
+// IMPORTANTE: nunca redireciona entre admin/* e aluno/* diretamente — isso causava
+// um loop infinito (ficava "carregando" para sempre) quando o usuário logado não
+// tinha o perfil esperado. Agora sempre volta para login.html com uma mensagem clara.
 function exigirLogin(perfilEsperado) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
         window.location.href = "../login.html";
         return;
       }
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      const dados = userDoc.exists ? userDoc.data() : null;
-      if (!dados || dados.role !== perfilEsperado) {
-        window.location.href = perfilEsperado === "admin" ? "../aluno/area.html" : "../admin/dashboard.html";
-        return;
+      try {
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        const dados = userDoc.exists ? userDoc.data() : null;
+
+        if (!dados) {
+          // Login existe no Firebase Auth, mas não há documento em "users/{uid}".
+          // Isso normalmente significa que o admin não foi cadastrado corretamente
+          // no Firestore (ver README, seção 3). Não redireciona sozinho — evita loop.
+          await auth.signOut();
+          window.location.href = "../login.html?erro=sem-perfil";
+          return;
+        }
+        if (dados.role !== perfilEsperado) {
+          await auth.signOut();
+          window.location.href = `../login.html?erro=perfil-incorreto&esperado=${perfilEsperado}`;
+          return;
+        }
+        resolve({ user, dados });
+      } catch (err) {
+        console.error("Erro ao verificar perfil do usuário:", err);
+        exibirErroFatal("Não foi possível verificar seu perfil de acesso. Verifique se as regras do Firestore foram publicadas corretamente (ver README) e tente novamente. Detalhe técnico: " + (err.message || err.code || err));
+        reject(err);
       }
-      resolve({ user, dados });
     });
   });
+}
+
+// Mostra um erro fatal visível na tela (em vez de deixar a página "carregando" para sempre)
+function exibirErroFatal(mensagem) {
+  const box = document.createElement("div");
+  box.style.cssText = "position:fixed;top:0;left:0;right:0;background:#C4432B;color:#fff;padding:1rem 1.5rem;z-index:9999;font-family:sans-serif;font-size:0.9rem;line-height:1.5;";
+  box.innerHTML = `<strong>Erro ao carregar o painel:</strong> ${mensagem}`;
+  document.body.prepend(box);
 }
 
 function logout() {

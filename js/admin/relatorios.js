@@ -1,14 +1,23 @@
 let relatorioAtual = { colunas: [], linhas: [], titulo: "" };
 
 (async function init() {
-  const { dados } = await exigirLogin("admin");
-  montarSidebarAdmin(dados.nome);
+  let sessao;
+  try {
+    sessao = await exigirLogin("admin");
+  } catch (err) {
+    return;
+  }
+  montarSidebarAdmin(sessao.dados.nome);
 
   document.getElementById("tipoRelatorio").addEventListener("change", gerarRelatorio);
   document.getElementById("btnExportarCsv").addEventListener("click", exportarCsv);
   document.getElementById("btnExportarPdf").addEventListener("click", exportarPdf);
 
-  await gerarRelatorio();
+  try {
+    await gerarRelatorio();
+  } catch (err) {
+    mostrarErroAdmin(err);
+  }
 })();
 
 async function gerarRelatorio() {
@@ -20,6 +29,8 @@ async function gerarRelatorio() {
   let colunas = [];
   let linhas = [];
   let titulo = "";
+
+  try {
 
   if (tipo === "matriculas") {
     titulo = "Relatório de Matrículas";
@@ -129,6 +140,10 @@ async function gerarRelatorio() {
     tbody.innerHTML = `<tr><td colspan="${colunas.length}" class="empty-state">Nenhum dado encontrado para este relatório.</td></tr>`;
   } else {
     tbody.innerHTML = linhas.map((linha) => `<tr>${linha.map((v) => `<td>${v}</td>`).join("")}</tr>`).join("");
+  }
+  } catch (err) {
+    mostrarErroAdmin(err);
+    tbody.innerHTML = `<tr><td class="empty-state">Não foi possível gerar este relatório. Veja o aviso acima.</td></tr>`;
   }
 }
 

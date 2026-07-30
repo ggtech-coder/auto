@@ -1,9 +1,14 @@
 let pagamentosTodos = [];
 
 (async function init() {
-  const { dados } = await exigirLogin("admin");
-  montarSidebarAdmin(dados.nome);
-  await carregarPagamentos();
+  let sessao;
+  try {
+    sessao = await exigirLogin("admin");
+  } catch (err) {
+    return;
+  }
+  montarSidebarAdmin(sessao.dados.nome);
+
   document.getElementById("btnNovoPagamento").addEventListener("click", () => {
     document.getElementById("modalPagamentoTitulo").textContent = "Novo lançamento";
     document.getElementById("formPagamento").reset();
@@ -11,6 +16,13 @@ let pagamentosTodos = [];
     document.getElementById("modalPagamento").classList.add("open");
   });
   document.getElementById("formPagamento").addEventListener("submit", salvarPagamento);
+
+  try {
+    await carregarPagamentos();
+  } catch (err) {
+    mostrarErroAdmin(err);
+    document.querySelector("#tabelaFinanceiro tbody").innerHTML = "<tr><td colspan='7' class='empty-state'>Não foi possível carregar os lançamentos. Veja o aviso acima.</td></tr>";
+  }
 })();
 
 async function carregarPagamentos() {
@@ -64,6 +76,11 @@ window.fecharModalPagamento = () => document.getElementById("modalPagamento").cl
 
 async function salvarPagamento(e) {
   e.preventDefault();
+  const btnSalvar = e.target.querySelector("button[type='submit']");
+  const textoOriginal = btnSalvar.textContent;
+  btnSalvar.disabled = true;
+  btnSalvar.textContent = "Salvando...";
+
   const id = document.getElementById("pagamentoId").value;
   const payload = {
     aluno: document.getElementById("pAluno").value.trim(),
@@ -73,18 +90,31 @@ async function salvarPagamento(e) {
     data: document.getElementById("pData").value,
     status: document.getElementById("pStatus").value,
   };
-  if (id) {
-    await db.collection("pagamentos").doc(id).update(payload);
-  } else {
-    payload.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
-    await db.collection("pagamentos").add(payload);
+  try {
+    if (id) {
+      await db.collection("pagamentos").doc(id).update(payload);
+    } else {
+      payload.criadoEm = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("pagamentos").add(payload);
+    }
+    fecharModalPagamento();
+    await carregarPagamentos();
+  } catch (err) {
+    alert("Não foi possível salvar o lançamento.\n\nDetalhe técnico: " + (err.code || err.message));
+    mostrarErroAdmin(err);
+  } finally {
+    btnSalvar.disabled = false;
+    btnSalvar.textContent = textoOriginal;
   }
-  fecharModalPagamento();
-  await carregarPagamentos();
 }
 
 window.excluirPagamento = async function (id) {
   if (!confirm("Excluir este lançamento?")) return;
-  await db.collection("pagamentos").doc(id).delete();
-  await carregarPagamentos();
+  try {
+    await db.collection("pagamentos").doc(id).delete();
+    await carregarPagamentos();
+  } catch (err) {
+    alert("Não foi possível excluir o lançamento.\n\nDetalhe técnico: " + (err.code || err.message));
+    mostrarErroAdmin(err);
+  }
 };

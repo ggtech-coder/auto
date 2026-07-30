@@ -1,5 +1,12 @@
 (async function init() {
-  const { dados } = await exigirLogin("aluno");
+  let sessao;
+  try {
+    sessao = await exigirLogin("aluno");
+  } catch (err) {
+    return; // exigirLogin já exibe a mensagem de erro na tela
+  }
+  const dados = sessao.dados;
+  try {
   document.getElementById("nomeAlunoSidebar").textContent = dados.nome || "Aluno";
   document.getElementById("nomeAlunoTopo").textContent = (dados.nome || "Aluno").split(" ")[0];
 
@@ -57,5 +64,15 @@
       const a = d.data();
       return `<div class="aviso-card"><h4>${a.titulo}</h4><p style="font-size:0.88rem;">${a.mensagem}</p><span>${formatarDataHoraBR(a.criadoEm)}</span></div>`;
     }).join("");
+  }
+  } catch (err) {
+    console.error(err);
+    const main = document.querySelector(".admin-main");
+    if (main) {
+      const banner = document.createElement("div");
+      banner.style.cssText = "background:#FBEAE6;border:1px solid #C4432B;color:#C4432B;padding:1rem 1.2rem;border-radius:10px;margin-bottom:1.2rem;font-size:0.88rem;";
+      banner.innerHTML = `<strong>Não foi possível carregar seus dados.</strong> Detalhe técnico: <code>${err.code || err.message}</code>`;
+      main.prepend(banner);
+    }
   }
 })();

@@ -1,31 +1,40 @@
 (async function () {
-  const { dados } = await exigirLogin("admin");
-  montarSidebarAdmin(dados.nome);
+  let sessao;
+  try {
+    sessao = await exigirLogin("admin");
+  } catch (err) {
+    return; // exigirLogin já mostra a mensagem de erro na tela
+  }
+  montarSidebarAdmin(sessao.dados.nome);
 
   document.getElementById("dataHoje").textContent = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 
+  try {
+    await carregarDashboard();
+  } catch (err) {
+    mostrarErroAdmin(err);
+  }
+})();
+
+async function carregarDashboard() {
   const hoje = hojeISO();
 
-  // Total de alunos
-  const alunosSnap = await db.collection("alunos").get();
-  document.getElementById("kpiAlunos").textContent = alunosSnap.size;
+  // Busca as coleções inteiras e faz todo o cálculo no navegador.
+  // Isso evita a necessidade de qualquer índice composto no Firestore.
+  const [alunosSnap, agendamentosSnap] = await Promise.all([
+    db.collection("alunos").get(),
+    db.collection("agendamentos").get(),
+  ]);
 
-  // Agendamentos hoje
-  const hojeSnap = await db.collection("agendamentos").where("data", "==", hoje).get();
-  document.getElementById("kpiHoje").textContent = hojeSnap.size;
+  const alunos = alunosSnap.docs.map((d) => d.data());
+  const agendamentos = agendamentosSnap.docs.map((d) => d.data());
 
-  // Agendamentos futuros (data > hoje, status confirmado)
-  const futurosSnap = await db.collection("agendamentos")
-    .where("data", ">", hoje).where("status", "==", "confirmado").get();
-  document.getElementById("kpiFuturos").textContent = futurosSnap.size;
+  document.getElementById("kpiAlunos").textContent = alunos.length;
+  document.getElementById("kpiHoje").textContent = agendamentos.filter((a) => a.data === hoje).length;
+  document.getElementById("kpiFuturos").textContent = agendamentos.filter((a) => a.data > hoje && a.status === "confirmado").length;
 
-  // Cancelamentos últimos 30 dias
   const limite = new Date(); limite.setDate(limite.getDate() - 30);
-  const todosSnap = await db.collection("agendamentos").where("status", "==", "cancelado").get();
-  const cancelamentos30 = todosSnap.docs.filter((d) => {
-    const c = d.data().criadoEm;
-    return c && c.toDate() >= limite;
-  });
+  const cancelamentos30 = agendamentos.filter((a) => a.status === "cancelado" && a.criadoEm && a.criadoEm.toDate() >= limite);
   document.getElementById("kpiCancelamentos").textContent = cancelamentos30.length;
 
   // Gráfico: novos cadastros últimos 7 dias
@@ -34,10 +43,9 @@
     return d.toISOString().slice(0, 10);
   });
   const contagemPorDia = Object.fromEntries(dias7.map((d) => [d, 0]));
-  alunosSnap.docs.forEach((doc) => {
-    const c = doc.data().criadoEm;
-    if (c) {
-      const iso = c.toDate().toISOString().slice(0, 10);
+  alunos.forEach((a) => {
+    if (a.criadoEm) {
+      const iso = a.criadoEm.toDate().toISOString().slice(0, 10);
       if (contagemPorDia[iso] !== undefined) contagemPorDia[iso]++;
     }
   });
@@ -51,12 +59,8 @@
   });
 
   // Gráfico: agendamentos por status
-  const todosAgendamentosSnap = await db.collection("agendamentos").get();
   const statusCount = { confirmado: 0, cancelado: 0, concluido: 0, falta: 0 };
-  todosAgendamentosSnap.docs.forEach((d) => {
-    const s = d.data().status;
-    if (statusCount[s] !== undefined) statusCount[s]++;
-  });
+  agendamentos.forEach((a) => { if (statusCount[a.status] !== undefined) statusCount[a.status]++; });
   new Chart(document.getElementById("chartStatus"), {
     type: "doughnut",
     data: {
@@ -67,16 +71,12 @@
   });
 
   // Próximos agendamentos (tabela)
-  const proximosSnap = await db.collection("agendamentos")
-    .where("data", ">=", hoje).where("status", "==", "confirmado")
-    .orderBy("data").limit(10).get();
+  const proximos = agendamentos
+    .filter((a) => a.data >= hoje && a.status === "confirmado")
+    .sort((a, b) => (a.data + a.horario).localeCompare(b.data + b.horario))
+    .slice(0, 10);
   const tbody = document.querySelector("#tabelaProximos tbody");
-  if (proximosSnap.empty) {
-    tbody.innerHTML = "<tr><td colspan='6' class='empty-state'>Nenhum agendamento futuro no momento.</td></tr>";
-  } else {
-    tbody.innerHTML = proximosSnap.docs.map((doc) => {
-      const a = doc.data();
-      return `<tr><td>${a.alunoNome}</td><td>${a.categoria}</td><td>${a.instrutorNome}</td><td>${formatarDataBR(a.data)}</td><td>${a.horario}</td><td><span class="badge badge-${a.status}">${a.status}</span></td></tr>`;
-    }).join("");
-  }
-})();
+  tbody.innerHTML = proximos.length
+    ? proximos.map((a) => `<tr><td>${a.alunoNome}</td><td>${a.categoria}</td><td>${a.instrutorNome}</td><td>${formatarDataBR(a.data)}</td><td>${a.horario}</td><td><span class="badge badge-${a.status}">${a.status}</span></td></tr>`).join("")
+    : "<tr><td colspan='6' class='empty-state'>Nenhum agendamento futuro no momento.</td></tr>";
+}

@@ -69,13 +69,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Busca agendamentos já confirmados para este instrutor nesta data
-    const ocupadosSnap = await db.collection("agendamentos")
-      .where("instrutorId", "==", instrutorId)
-      .where("data", "==", data)
-      .where("status", "in", ["confirmado", "concluido"])
-      .get();
-    const ocupados = new Set(ocupadosSnap.docs.map((d) => d.data().horario));
+    // Busca agendamentos deste instrutor nesta data e filtra o status no navegador
+    // (evita depender de índice composto para a combinação com "in").
+    let ocupados;
+    try {
+      const ocupadosSnap = await db.collection("agendamentos")
+        .where("instrutorId", "==", instrutorId)
+        .where("data", "==", data)
+        .get();
+      ocupados = new Set(
+        ocupadosSnap.docs
+          .map((d) => d.data())
+          .filter((a) => a.status === "confirmado" || a.status === "concluido")
+          .map((a) => a.horario)
+      );
+    } catch (err) {
+      slotsContainer.innerHTML = `<p class='form-help' style="color:var(--color-danger);">Não foi possível verificar os horários (${err.code || err.message}). Tente novamente em instantes.</p>`;
+      return;
+    }
 
     slotsContainer.innerHTML = "";
     disponibilidade.forEach((h) => {
@@ -120,13 +131,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       // Checagem final anti-conflito (dupla checagem contra corrida de agendamento)
-      const conflito = await db.collection("agendamentos")
+      const conflitoSnap = await db.collection("agendamentos")
         .where("instrutorId", "==", instrutorId)
         .where("data", "==", data)
         .where("horario", "==", horario)
-        .where("status", "in", ["confirmado", "concluido"])
         .get();
-      if (!conflito.empty) {
+      const conflito = conflitoSnap.docs.some((d) => {
+        const s = d.data().status;
+        return s === "confirmado" || s === "concluido";
+      });
+      if (conflito) {
         msg.className = "form-msg show error";
         msg.textContent = "Esse horário acabou de ser reservado por outra pessoa. Escolha outro.";
         await carregarHorarios();

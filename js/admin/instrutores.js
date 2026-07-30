@@ -3,8 +3,13 @@ let veiculosCache = [];
 const DIAS = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
 
 (async function init() {
-  const { dados } = await exigirLogin("admin");
-  montarSidebarAdmin(dados.nome);
+  let sessao;
+  try {
+    sessao = await exigirLogin("admin");
+  } catch (err) {
+    return;
+  }
+  montarSidebarAdmin(sessao.dados.nome);
 
   const chipWrap = document.getElementById("chipCategorias");
   SITE_CONFIG.categorias.forEach((c) => {
@@ -13,18 +18,24 @@ const DIAS = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
     chipWrap.appendChild(label);
   });
 
-  const veicSnap = await db.collection("veiculos").get();
-  veiculosCache = veicSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  const iVeiculo = document.getElementById("iVeiculo");
-  veiculosCache.forEach((v) => {
-    const opt = document.createElement("option");
-    opt.value = v.id; opt.textContent = `${v.modelo} — ${v.placa}`;
-    iVeiculo.appendChild(opt);
-  });
-
-  await carregarInstrutores();
   document.getElementById("btnNovoInstrutor").addEventListener("click", abrirModalInstrutor);
   document.getElementById("formInstrutor").addEventListener("submit", salvarInstrutor);
+
+  try {
+    const veicSnap = await db.collection("veiculos").get();
+    veiculosCache = veicSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const iVeiculo = document.getElementById("iVeiculo");
+    veiculosCache.forEach((v) => {
+      const opt = document.createElement("option");
+      opt.value = v.id; opt.textContent = `${v.modelo} — ${v.placa}`;
+      iVeiculo.appendChild(opt);
+    });
+
+    await carregarInstrutores();
+  } catch (err) {
+    mostrarErroAdmin(err);
+    document.querySelector("#tabelaInstrutores tbody").innerHTML = "<tr><td colspan='6' class='empty-state'>Não foi possível carregar os instrutores. Veja o aviso acima.</td></tr>";
+  }
 })();
 
 async function carregarInstrutores() {
@@ -79,6 +90,11 @@ window.editarInstrutor = function (id) {
 
 async function salvarInstrutor(e) {
   e.preventDefault();
+  const btnSalvar = e.target.querySelector("button[type='submit']");
+  const textoOriginal = btnSalvar.textContent;
+  btnSalvar.disabled = true;
+  btnSalvar.textContent = "Salvando...";
+
   const id = document.getElementById("instrutorId").value;
   const categorias = [...document.querySelectorAll("#chipCategorias input:checked")].map((c) => c.value);
   const disponibilidade = {};
@@ -94,17 +110,30 @@ async function salvarInstrutor(e) {
     ativo: document.getElementById("iAtivo").value === "true",
     disponibilidade,
   };
-  if (id) {
-    await db.collection("instrutores").doc(id).update(payload);
-  } else {
-    await db.collection("instrutores").add(payload);
+  try {
+    if (id) {
+      await db.collection("instrutores").doc(id).update(payload);
+    } else {
+      await db.collection("instrutores").add(payload);
+    }
+    fecharModalInstrutor();
+    await carregarInstrutores();
+  } catch (err) {
+    alert("Não foi possível salvar o instrutor.\n\nDetalhe técnico: " + (err.code || err.message));
+    mostrarErroAdmin(err);
+  } finally {
+    btnSalvar.disabled = false;
+    btnSalvar.textContent = textoOriginal;
   }
-  fecharModalInstrutor();
-  await carregarInstrutores();
 }
 
 window.excluirInstrutor = async function (id) {
   if (!confirm("Excluir este instrutor?")) return;
-  await db.collection("instrutores").doc(id).delete();
-  await carregarInstrutores();
+  try {
+    await db.collection("instrutores").doc(id).delete();
+    await carregarInstrutores();
+  } catch (err) {
+    alert("Não foi possível excluir o instrutor.\n\nDetalhe técnico: " + (err.code || err.message));
+    mostrarErroAdmin(err);
+  }
 };

@@ -145,7 +145,31 @@ projetos Firestore com filtros combinados.
 
 ---
 
-## 9. Personalização
+## 9. Solução de problemas ("painel não funciona / fica carregando")
+
+Se o painel administrativo não deixava criar aluno/instrutor/veículo e os botões pareciam
+travados, o motivo era uma combinação de duas coisas, já corrigidas nesta versão:
+
+1. **As regras do Firestore (`firestore.rules`) precisam estar publicadas no Console.**
+   Se o documento `users/{uid}` do seu admin não existir ou não tiver `role: "admin"`,
+   toda operação de escrita falha silenciosamente. Agora, qualquer erro de permissão
+   aparece em uma faixa vermelha no topo do painel, com a mensagem técnica exata.
+2. As páginas do painel agora registram os botões **antes** de carregar os dados —
+   então, mesmo que o carregamento falhe, os botões continuam clicáveis e mostram
+   um alerta com o motivo do erro em vez de "travar".
+
+**Se você já publicou este projeto antes**, é importante **republicar o arquivo
+`firestore.rules`** atualizado no Console (Firestore → Regras → colar o conteúdo
+novo → Publicar), pois a regra de leitura da coleção `agendamentos` foi ajustada
+para permitir consulta pública de horários (necessária para a página de agendamento
+funcionar sem login).
+
+Se depois disso ainda aparecer erro, copie a mensagem técnica exibida na faixa vermelha
+(ou no console do navegador, F12) — ela aponta exatamente qual passo do setup falta.
+
+---
+
+## 11. Personalização
 
 Todos os textos, cores e dados de contato ficam centralizados em **`config.js`** e no arquivo
 **`css/style.css`** (variáveis `:root`). Não é necessário editar cada página HTML individualmente
