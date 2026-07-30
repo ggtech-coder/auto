@@ -55,6 +55,16 @@ autocadastrar pelo site. Para criar o primeiro admin:
    ```
 4. Pronto — esse login agora acessa `admin/dashboard.html`. Repita para outros administradores.
 
+> ⚠️ **Causa nº 1 do erro "permission-denied" em várias telas do painel:** o campo
+> `role` tem que ser exatamente o texto `admin` (minúsculo, sem espaços, sem aspas
+> extras) e o **ID do documento** em `users` tem que ser **idêntico ao UID** do
+> usuário no Authentication (não o e-mail, não um ID aleatório). Depois de criar
+> ou corrigir esse documento, se o painel continuar travado, faça logout e login
+> de novo — o app lê esse perfil só no momento do login.
+> Confira também se o conteúdo de `firestore.rules` deste projeto foi
+> realmente **colado e publicado** em Firestore → Regras (edições salvas mas
+> não publicadas não valem).
+
 ---
 
 ## 4. Popular dados iniciais (instrutores e veículos)
@@ -166,6 +176,17 @@ funcionar sem login).
 
 Se depois disso ainda aparecer erro, copie a mensagem técnica exibida na faixa vermelha
 (ou no console do navegador, F12) — ela aponta exatamente qual passo do setup falta.
+
+**Atualização de segurança (regras endurecidas):** as regras foram ajustadas para que
+**somente o admin** possa listar/editar/excluir alunos, usuários, instrutores, veículos,
+agendamentos e pagamentos. Um aluno logado só consegue ler o **próprio** cadastro (nunca
+uma lista de todos os alunos) — e é exatamente uma consulta desse tipo (buscar aluno
+pré-cadastrado por CPF, varrendo a coleção inteira) que o Firestore sempre bloqueava com
+`permission-denied` durante o autocadastro. Essa busca foi removida de `js/auth.js`: agora
+o autocadastro sempre cria um registro novo em "alunos". Se um aluno já tinha sido
+pré-cadastrado pela administração (mesmo CPF) e depois se autocadastrou, vai existir um
+registro duplicado — basta o admin excluir o antigo (ou copiar os dados) pela tela
+**Alunos** do painel.
 
 ---
 

@@ -1,82 +1,83 @@
 rules_version = '2';
 
-// ============================================================
-// REGRAS DE SEGURANÇA DO FIRESTORE — Autoescola Rota Certa
-// Cole este conteúdo em: Firebase Console > Firestore Database > Regras
-//
-// Modelo de acesso:
-// - "users/{uid}"      -> perfil (admin | aluno), somente leitura do próprio doc
-// - "alunos/{id}"       -> admin: tudo. aluno: leitura/edição apenas do próprio doc (uid == auth.uid)
-// - "instrutores/{id}"  -> leitura pública (necessária no agendamento), escrita só admin
-// - "veiculos/{id}"     -> leitura pública, escrita só admin
-// - "agendamentos/{id}" -> criação pública (agendamento online sem login),
-//                           leitura/edição/exclusão só admin ou o próprio aluno (por cpf)
-// - "avisos/{id}"       -> leitura pública (autenticado), escrita só admin
-// - "pagamentos/{id}"   -> somente admin
-// ============================================================
-
-function isSignedIn() {
-  return request.auth != null;
-}
-
-function isAdmin() {
-  return isSignedIn() &&
-    exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-    get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-}
-
-function isOwnerAluno(alunoId) {
-  return isSignedIn() &&
-    exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-    get(/databases/$(database)/documents/users/$(request.auth.uid)).data.alunoId == alunoId;
-}
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwnerAluno(alunoId) {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.alunoId == alunoId;
+    }
+
+    // ---------- USERS ----------
+    // Cada pessoa só enxerga o próprio perfil (para saber se é admin ou aluno).
+    // Listar/gerenciar todos os usuários é só do admin.
     match /users/{uid} {
-      allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
-      // Um usuário pode criar seu PRÓPRIO doc apenas com role "aluno" (o app nunca envia "admin" no signup público).
-      // Isso impede que alguém se autopromova a administrador pelo cliente.
+      allow get:    if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow list:   if isAdmin();
       allow create: if isAdmin() || (isSignedIn() && request.auth.uid == uid && request.resource.data.role == 'aluno');
       allow update: if isAdmin() || (isSignedIn() && request.auth.uid == uid && request.resource.data.role == resource.data.role);
       allow delete: if isAdmin();
     }
 
+    // ---------- ALUNOS ----------
+    // O aluno só consegue LER o próprio cadastro (busca direta pelo ID salvo
+    // em users/{uid}.alunoId) — nunca uma listagem/consulta da coleção
+    // inteira; isso é reservado ao admin. A criação continua liberada no
+    // autocadastro (senão o cadastro público de alunos para de funcionar).
+    // Editar, excluir ou listar todos os alunos é só do admin.
     match /alunos/{alunoId} {
-      allow read: if isAdmin() || isOwnerAluno(alunoId);
-      allow create: if isAdmin() || isSignedIn(); // permite auto-cadastro no signup
-      allow update: if isAdmin() || isOwnerAluno(alunoId);
+      allow get:    if isAdmin() || isOwnerAluno(alunoId);
+      allow list:   if isAdmin();
+      allow create: if isAdmin() || isSignedIn();
+      allow update: if isAdmin();
       allow delete: if isAdmin();
     }
 
+    // ---------- INSTRUTORES ----------
+    // Leitura pública é necessária para a página de agendamento (sem login)
+    // mostrar os instrutores disponíveis. Só o admin cadastra/edita/remove.
     match /instrutores/{id} {
-      allow read: if true;
+      allow read:  if true;
       allow write: if isAdmin();
     }
 
+    // ---------- VEÍCULOS ----------
     match /veiculos/{id} {
-      allow read: if true;
+      allow read:  if true;
       allow write: if isAdmin();
     }
 
+    // ---------- AGENDAMENTOS ----------
+    // Leitura pública (para ver horários livres) e criação pública
+    // (formulário de agendamento, sem login) continuam liberadas — é o
+    // coração do sistema. Alterar status, editar ou excluir é só do admin.
     match /agendamentos/{id} {
-      // Leitura pública: necessária para a página de agendamento (sem login) verificar
-      // quais horários já estão ocupados antes de permitir a confirmação.
-      // Atenção: isso torna nome/CPF/telefone/e-mail dos agendamentos visíveis a quem
-      // souber consultar a coleção diretamente. Para um projeto em produção com mais
-      // rigor de LGPD, mova essa checagem para uma Cloud Function (plano Blaze) que
-      // devolva só os horários ocupados, sem os dados pessoais. Ver README, seção 7.
-      allow read: if true;
-      allow create: if true; // agendamento online público
+      allow read:           if true;
+      allow create:         if true;
       allow update, delete: if isAdmin();
     }
 
+    // ---------- AVISOS ----------
+    // Qualquer pessoa logada (aluno ou admin) pode ler o mural de avisos.
+    // Só o admin publica/edita/remove avisos.
     match /avisos/{id} {
-      allow read: if isSignedIn();
+      allow read:  if isSignedIn();
       allow write: if isAdmin();
     }
 
+    // ---------- PAGAMENTOS / FINANCEIRO ----------
+    // 100% restrito ao admin — nenhum outro perfil lê ou grava aqui.
     match /pagamentos/{id} {
       allow read, write: if isAdmin();
     }

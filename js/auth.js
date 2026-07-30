@@ -107,20 +107,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const cred = await auth.createUserWithEmailAndPassword(email, senha);
         const uid = cred.user.uid;
 
-        // Procura aluno pré-cadastrado (pela administração) com o mesmo CPF
-        const existente = await db.collection("alunos").where("cpf", "==", cpf).limit(1).get();
-        let alunoId;
-        if (!existente.empty) {
-          alunoId = existente.docs[0].id;
-          await db.collection("alunos").doc(alunoId).update({ uid, email });
-        } else {
-          const novo = await db.collection("alunos").add({
-            nome, cpf, email, telefone: "", rg: "", dataNascimento: "",
-            endereco: "", categoria: "", situacao: "pendente",
-            uid, criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
-          });
-          alunoId = novo.id;
-        }
+        // OBS: o autocadastro sempre cria um novo registro em "alunos" para o
+        // próprio usuário (permitido pela regra de segurança). Não fazemos mais
+        // uma busca por CPF em "alunos" aqui, porque essa consulta batia contra
+        // toda a coleção e o Firestore bloqueia (permission-denied) qualquer
+        // consulta em lista que as regras não conseguem validar previamente —
+        // só o admin pode listar/consultar todos os alunos. Se este aluno já
+        // tinha sido pré-cadastrado pela administração (mesmo CPF), o admin
+        // deve mesclar ou excluir o registro antigo pelo painel (Alunos).
+        const novo = await db.collection("alunos").add({
+          nome, cpf, email, telefone: "", rg: "", dataNascimento: "",
+          endereco: "", categoria: "", situacao: "pendente",
+          uid, criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        const alunoId = novo.id;
 
         await db.collection("users").doc(uid).set({
           role: "aluno", nome, email, alunoId,
